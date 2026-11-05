@@ -1,0 +1,122 @@
+/* GDR · Strumenti comuni: gli stili delle pagine dei journal generate dai dati delle campagne.
+   .gdr-regola è il box di un riquadro «Regola» nelle pagine solo GM «Regole dello scontro».
+   Il bordo è semitrasparente e il testo eredita il suo colore. Il colore del titolo e della linea a sinistra sta in una
+   variabile messa sugli elementi a tema di Foundry (.theme-light, .theme-dark): vince il tema più vicino, anche con un
+   journal chiaro in un'interfaccia scura, e il contrasto resta sopra il 4,5:1 sui fondi chiari e su quelli scuri. */
+.theme-light { --gdr-accento: #2c5b71; --gdr-testo: #222222; }
+.theme-dark { --gdr-accento: #8fc3d9; --gdr-testo: #e6e6e6; }
+/* --gdr-testo: il testo delle finestre del modulo («Doppio nome…»), dal tema più vicino; non --color-text-primary, che un modulo come
+   Swipe VTT mette bianco su tutto il body, né una variabile interna di Foundry */
+.gdr-regola {
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-left: 4px solid var(--gdr-accento, #2c5b71);
+  border-radius: 4px;
+  padding: 0.4em 0.8em 0.1em;
+  margin: 0 0 0.7em;
+}
+.gdr-regola > p:first-child > strong:first-child {
+  color: var(--gdr-accento, #2c5b71);
+}
+
+/* L'indice dei journal che si richiude (scripts/indice.mjs), sulle misure nel foglio di dnd5e:
+   la freccia fra il numero e il titolo, spostata col livello (il rientro passa dal titolo alla freccia), uno spazio uguale sulle voci
+   senza freccia, le linee guida dei gruppi sotto la freccia del capo. Con del testo nella ricerca, o durante un trascinamento, si vede
+   tutto. */
+.toc:not(.gdr-indice-tutto) li.gdr-indice-nascosta { display: none !important; }
+.toc.gdr-indice-rientro li .page-title { text-indent: 0 !important; }
+/* i titoli della pagina aperti, spostati dal codice sotto il titolo della voce: l'elenco si stringe invece di uscire dall'indice */
+.toc li > [data-gdr-spostato] { width: auto !important; max-width: none !important; min-width: 0; }
+.toc li.gdr-indice-membro { position: relative; }
+/* I colori: in OKLCH, la tinta dal codice (--gdr-h); luminosità e croma dal fondo vero dell'indice (data-gdr-chiaro, deciso dal
+   codice dal colore del testo dei titoli: in dnd5e l'indice resta scuro anche col tema chiaro). */
+.toc { --gdr-barra-l: 72%; --gdr-barra-c: 0.13; --gdr-barra2-l: 86%; --gdr-barra2-c: 0.08; }
+.toc[data-gdr-chiaro] { --gdr-barra-l: 48%; --gdr-barra-c: 0.14; --gdr-barra2-l: 60%; --gdr-barra2-c: 0.11; }
+.toc .gdr-indice-barre { position: absolute; left: 0; top: 0; bottom: 0; width: 0; pointer-events: none; }
+.toc .gdr-indice-barre > span {
+  position: absolute; top: 0; bottom: -1px; border-radius: 1px;
+  background: oklch(var(--gdr-barra-l) var(--gdr-barra-c) var(--gdr-h));
+}
+.toc .gdr-indice-barre > span[data-gdr-prof="1"] { background: oklch(var(--gdr-barra2-l) var(--gdr-barra2-c) var(--gdr-h)); }
+.toc .gdr-indice-barre > span[data-gdr-inizio] { top: calc(50% + 7px); }
+.toc .gdr-indice-barre > span[data-gdr-fine] { bottom: calc(50% - 1px); }
+.toc .gdr-indice-barre > span[data-gdr-inizio][data-gdr-fine] { display: none; }
+/* La freccia: un bersaglio di 24 px (WCAG 2.5.8), senza allargare la riga; lo spazio sulle voci senza freccia è largo uguale. */
+.toc .gdr-indice-freccia, .toc .gdr-indice-spazio {
+  display: inline-flex; align-items: center; justify-content: center; align-self: center; flex: 0 0 auto;
+  width: 24px; min-width: 24px; height: 24px; margin-top: -4px; margin-bottom: -4px; margin-right: 0; padding: 0;
+}
+.toc .gdr-indice-freccia {
+  border: none; border-radius: 4px; background: none; box-shadow: none; color: inherit; opacity: 0.9; cursor: pointer; line-height: 1; font-size: 13px;
+}
+.toc .gdr-indice-freccia:hover { opacity: 1; background: rgba(128, 128, 128, 0.22); }
+.toc .gdr-indice-freccia:focus-visible { opacity: 1; outline: 2px solid var(--color-text-light-highlight, #fff); outline-offset: -2px; }
+.toc .gdr-indice-freccia.gdr-indice-dentro { opacity: 1; color: var(--color-text-accent, #ee9b3a); }
+.toc.gdr-indice-tutto .gdr-indice-freccia { visibility: hidden; }
+
+/* «Scopri» staccato in una finestra sua (scripts/scopri.mjs, impagina): il pannello è una colonna alta quanto la finestra, la lista
+   prende lo spazio che resta e scorre lei, i pulsanti stanno in fondo. Le regole valgono solo con la classe «gdr-staccata», che si toglie al
+   riattacco: la posizione e la misura che Foundry scrive sul pannello restano sue. Gli !important battono la posizione e l'altezza che
+   Foundry scrive in linea e il max-height della lista. :has() prende i contenitori fra il pannello e la lista, qualunque sia la struttura del dialogo. */
+.gdr-scopri.gdr-staccata:not(.minimized) {
+  /* ancorato ai bordi della finestra (position: fixed), non al contenitore della pagina staccata, che resta dell'altezza di quando la
+     finestra si è aperta: allargata la finestra, il pannello non crescerebbe e i pulsanti resterebbero tagliati. Un antenato con
+     overflow nascosto non taglia un elemento fixed. */
+  position: fixed !important;
+  inset: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transform: none !important;
+}
+/* un antenato con transform, filter, contain o simili diventerebbe il riferimento di position: fixed, e il pannello si taglierebbe di
+   nuovo sul suo contenitore: da staccato, gli antenati del pannello (la classe la mette impagina, solo nella finestra staccata) non li hanno */
+.gdr-scopri-antenato {
+  transform: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  perspective: none !important;
+  contain: none !important;
+  will-change: auto !important;
+}
+.gdr-scopri.gdr-staccata:not(.minimized) :has(.gdr-scopri-lista) {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+.gdr-scopri.gdr-staccata:not(.minimized) > :not(:has(.gdr-scopri-lista)),
+.gdr-scopri.gdr-staccata:not(.minimized) :has(.gdr-scopri-lista) > :not(:has(.gdr-scopri-lista)):not(.gdr-scopri-lista) {
+  flex: 0 0 auto !important;
+}
+.gdr-scopri.gdr-staccata:not(.minimized) .gdr-scopri-lista {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
+/* Le immagini delle voci (classe «gdr-figura», messa dai programmi che preparano i dati): i luoghi, orizzontali, lasciano lo spazio
+   per la descrizione sotto, mentre un ritratto, verticale, la spingerebbe fuori dalla finestra. Alte al massimo quanto un'immagine 3:2 alla
+   larghezza del paragrafo che le contiene: le orizzontali restano come sono, un ritratto 2:3 scende a due terzi dell'altezza, centrato. */
+/* contain-intrinsic-inline-size: una larghezza di riserva, se il paragrafo sta in un contenitore che si stringe sul contenuto (flex, float,
+   tabella), dove senza resterebbe largo 0 e l'immagine sparirebbe; specificità 0,2,3 e object-fit, perché una regola di un altro modulo
+   non la batta né deformi il ritratto */
+/* Il contenitore è l'elemento che ha l'immagine come figlio: di solito un paragrafo centrato, ma un salvataggio
+   nell'editor di Foundry toglie il paragrafo e lascia l'immagine nel blocco o nella pagina:
+   la regola vale anche così. In Foundry le immagini delle pagine sono display: block con margine 0, e il text-align del paragrafo non le
+   sposta: nel paragrafo sono inline-block, centrate dal paragrafo e due affiancate; fuori dal paragrafo, block col margine automatico. */
+:has(> img.gdr-figura) { container-type: inline-size; contain-intrinsic-inline-size: 404px; }
+img.gdr-figura { max-width: 100%; }
+:has(> img.gdr-figura) > img.gdr-figura { max-height: 66.667cqw; width: auto; height: auto; max-width: 100%; object-fit: contain; vertical-align: middle; }
+p:has(> img.gdr-figura) > img.gdr-figura.gdr-figura { display: inline-block; margin-top: 0; margin-bottom: 0; }
+:not(p):has(> img.gdr-figura) > img.gdr-figura.gdr-figura { display: block; margin-left: auto; margin-right: auto; }
+/* due immagini vicine senza paragrafo (un salvataggio nell'editor): affiancate, a sinistra, perché senza il paragrafo niente le centra;
+   la classe doppia alza la specificità contro le regole di altri moduli */
+:not(p) > img.gdr-figura.gdr-figura:has(+ img.gdr-figura), :not(p) > img.gdr-figura + img.gdr-figura.gdr-figura { display: inline-block; margin-left: 0; margin-right: 0; }
+/* il margine solo fra due immagini vicine: sulle orizzontali, larghe quanto la colonna, farebbe uscire la riga e comparire la barra di
+   scorrimento orizzontale */
+img.gdr-figura + img.gdr-figura.gdr-figura.gdr-figura { margin-left: 6px; max-width: calc(100% - 6px); }

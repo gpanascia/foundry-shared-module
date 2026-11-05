@@ -1,0 +1,40 @@
+# Le prove del modulo, a ogni pull request e a ogni invio su master. Gira coi permessi di sola lettura e senza segreti:
+# una pull request da un fork parte solo dopo l'approvazione di chi ha la scrittura (impostazioni del repository).
+name: Prove
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prove-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prove:
+    name: Prove (${{ matrix.giro }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        giro: [test, "test:senza-subtle"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Le dipendenze delle prove
+        working-directory: prove
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Le prove
+        working-directory: prove
+        run: npm run "$GIRO"
+        env:
+          GIRO: ${{ matrix.giro }}

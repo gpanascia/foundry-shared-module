@@ -1,0 +1,12 @@
+{
+  "id": "gdr-strumenti",
+  "title": "GDR · Strumenti comuni",
+  "description": "Strumenti comuni per i mondi di D&D 5e: sussurri coi link alle pagine, luci, audio, la sincronizzazione degli oggetti e il doppio nome dei PNG; il caricatore che porta nel mondo i contenuti preparati altrove, «Scopri», la mappa che si compone, l'indice dei journal che si richiude e gli stili delle pagine generate. In ogni mondo resta una macro di una riga che chiama il modulo.",
+  "version": "1.19.0",
+  "authors": [{ "name": "gpanascia", "url": "https://github.com/gpanascia" }, { "name": "Claude" }],
+  "url": "https://github.com/gpanascia/foundry-shared-module",
+  "bugs": "https://github.com/gpanascia/foundry-shared-module/issues",
+  "compatibility": { "minimum": "13", "verified": "14.369" },
+  "esmodules": ["scripts/main.mjs"],
+  "styles": ["styles/gdr-strumenti.css"]
+}

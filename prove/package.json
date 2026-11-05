@@ -1,0 +1,17 @@
+{
+  "name": "gdr-strumenti-prove",
+  "private": true,
+  "description": "Le prove del modulo «GDR · Strumenti comuni» per Foundry VTT, in Node, su un Foundry finto",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node prove.mjs && node prove-indice.mjs && node prove-scopri.mjs",
+    "test:senza-subtle": "node prove.mjs --senza-subtle"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.3"
+  }
+}
